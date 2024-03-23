@@ -1,7 +1,16 @@
 package main
 
-import "fmt"
+import (
+	"net/http"
+
+	"github.com/mvitta/GoRoutineMiniProject/routes"
+)
 
 func main() {
-	fmt.Println("Hola Mundo !")
+
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("GET /", routes.HandlerMain)
+
+	http.ListenAndServe(":8080", mux)
 }
