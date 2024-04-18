@@ -1,6 +1,7 @@
 package fetch
 
 import (
+	"encoding/json"
 	"errors"
 	"io"
 	"log/slog"
@@ -20,24 +21,20 @@ func RequestWithHeader(URL string) *http.Request {
 	return req
 }
 
-func Fetch(URL string) []byte {
-	var book []byte
-
+func ToDoRequest(URL string, b any) {
 	req := RequestWithHeader(URL)
 	if !(req != nil) {
 		slog.Info(errors.New("the request was not create").Error())
-		return book
 	}
-
 	response, err := http.DefaultClient.Do(req)
 	if err != nil {
 		slog.Info(err.Error())
-		return book
 	}
 	defer response.Body.Close()
-
 	if response.StatusCode == 200 {
-		book, _ = io.ReadAll(response.Body)
+		var data, _ = io.ReadAll(response.Body)
+		json.Unmarshal(data, b)
+
 	}
-	return book
+
 }
