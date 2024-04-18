@@ -14,6 +14,7 @@ func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		slog.Info("Failed to load env")
+		panic(err.Error())
 	}
 
 	mux.HandleFunc("GET /", routes.HandlerMain)
