@@ -15,7 +15,6 @@ func RequestWithHeader(URL string) *http.Request {
 		slog.Info(err.Error())
 		return nil
 	}
-
 	req.Header.Add("X-RapidAPI-Key", os.Getenv("API_KEY"))
 	req.Header.Add("X-RapidAPI-Host", os.Getenv("API_HOST"))
 	return req
@@ -34,7 +33,6 @@ func ToDoRequest(URL string, b any) {
 	if response.StatusCode == 200 {
 		var data, _ = io.ReadAll(response.Body)
 		json.Unmarshal(data, b)
-
 	}
 
 }
