@@ -2,36 +2,31 @@ package fetch
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 	"log/slog"
 	"net/http"
-	"os"
+	"net/url"
 )
 
-func RequestWithHeader(URL string) *http.Request {
-	req, err := http.NewRequest("GET", URL, nil)
-	if err != nil {
-		slog.Info(err.Error())
-		return nil
-	}
-	req.Header.Add("X-RapidAPI-Key", os.Getenv("API_KEY"))
-	req.Header.Add("X-RapidAPI-Host", os.Getenv("API_HOST"))
-	return req
-}
+func ToDoRequest(RawURL string, b any) {
+	URL, _ := url.Parse(RawURL)
+	response, err := http.DefaultClient.Do(&http.Request{
+		Method: http.MethodGet,
+		URL: &url.URL{
+			Scheme:   URL.Scheme,
+			Host:     URL.Host,
+			Path:     URL.Path,
+			RawQuery: URL.RawQuery,
+		},
+	})
 
-func ToDoRequest(URL string, b any) {
-	req := RequestWithHeader(URL)
-	if !(req != nil) {
-		slog.Info(errors.New("the request was not create").Error())
-	}
-	response, err := http.DefaultClient.Do(req)
 	if err != nil {
 		slog.Info(err.Error())
 	}
-	defer response.Body.Close()
-	if response.StatusCode == 200 {
+
+	if response.StatusCode == http.StatusOK {
 		var data, _ = io.ReadAll(response.Body)
+		defer response.Body.Close()
 		json.Unmarshal(data, b)
 	}
 
